@@ -1144,7 +1144,7 @@ impl IndexScheduler {
     }
 
     pub fn remotes_statuses(&self) -> &RemotesStatuses {
-        &self.features.remotes_statuses
+        self.features.remotes_statuses()
     }
 
     pub fn put_runtime_features(&self, features: RuntimeTogglableFeatures) -> Result<()> {
