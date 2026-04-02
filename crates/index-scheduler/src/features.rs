@@ -25,6 +25,7 @@ pub(crate) struct FeatureData {
     persisted: Database<Str, SerdeJson<RuntimeTogglableFeatures>>,
     runtime: Arc<RwLock<RuntimeTogglableFeatures>>,
     network: Arc<RwLock<Network>>,
+    pub remotes_statuses: Arc<RemotesStatuses>,
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -234,6 +235,7 @@ impl FeatureData {
             persisted: runtime_features_db,
             runtime,
             network: Arc::new(RwLock::new(network)),
+            remotes_statuses: Arc::new(RemotesStatuses::new()),
         })
     }
 

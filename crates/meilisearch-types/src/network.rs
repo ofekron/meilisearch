@@ -1,5 +1,4 @@
 use std::collections::{BTreeMap, BTreeSet};
-use std::sync::Arc;
 use std::time::{Duration, Instant};
 
 use papaya::HashMap;
@@ -41,12 +40,12 @@ pub struct Shard {
 }
 
 /// Keeps track of the unavailability period for each remote.
-#[derive(Debug, Clone)]
-pub struct RemotesStatuses(Arc<HashMap<String, Unavailability>>);
+#[derive(Debug)]
+pub struct RemotesStatuses(HashMap<String, Unavailability>);
 
 impl RemotesStatuses {
     pub fn new() -> Self {
-        Self(Arc::new(HashMap::default()))
+        Self(HashMap::default())
     }
 
     /// Returns `true` if the remote is available, `false` otherwise.
