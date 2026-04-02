@@ -31,6 +31,8 @@ pub struct Remote {
     pub search_api_key: Option<String>,
     #[serde(default)]
     pub write_api_key: Option<String>,
+    #[serde(default)]
+    pub status: route::Status,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
@@ -153,10 +155,11 @@ pub mod route {
         },
     }
 
-    #[derive(Serialize, Deserialize, ToSchema)]
+    #[derive(Debug, Default, Serialize, Deserialize, ToSchema, Clone, PartialEq, Eq)]
     #[serde(rename_all = "camelCase", tag = "type")]
     #[schema(rename_all = "camelCase")]
     pub enum Status {
+        #[default]
         Available,
         Unavailable,
         // TODO Add UnavailableUntil or similar?
