@@ -52,6 +52,8 @@ jobs:
           platforms: linux/${{ matrix.platform }}
           labels: ${{ steps.meta.outputs.labels }}
           push: false
+          cache-from: type=gha,scope=${{ matrix.platform }}-${{ matrix.edition }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.platform }}-${{ matrix.edition }}
           build-args: |
             COMMIT_SHA=${{ github.sha }}
             COMMIT_DATE=${{ steps.build-metadata.outputs.date }}
