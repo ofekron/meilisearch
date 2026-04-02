@@ -115,7 +115,9 @@ impl ScoreWithRatioResult {
             vector_results.document_scores.len() + keyword_results.document_scores.len(),
         );
 
-        let distinct_fid = distinct_fid(distinct, index, rtxn)?;
+        let fields_ids_map = index.fields_ids_map(rtxn)?;
+
+        let distinct_fid = distinct_fid(distinct, index, rtxn, &fields_ids_map)?;
         let mut excluded_documents = RoaringBitmap::new();
         for res in vector_results
             .document_scores
@@ -138,11 +140,13 @@ impl ScoreWithRatioResult {
                     return None;
                 }
 
-                if let Some(distinct_fid) = distinct_fid {
+                if let Some((distinct_fid, distinct_field_name)) = distinct_fid {
                     if let Err(error) = distinct_single_docid(
                         index,
                         rtxn,
                         distinct_fid,
+                        distinct_field_name,
+                        &fields_ids_map,
                         docid,
                         &mut excluded_documents,
                     ) {
