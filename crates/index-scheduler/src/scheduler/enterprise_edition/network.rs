@@ -506,6 +506,18 @@ impl IndexScheduler {
 
         Ok(())
     }
+
+    pub fn is_remote_available(&self, remote_name: &str) -> Result<bool> {
+        Ok(self.remotes_statuses.is_available(remote_name))
+    }
+
+    pub fn mark_remote_unavailable(&self, remote_name: String) -> Result<()> {
+        Ok(self.remotes_statuses.mark_unavailable(remote_name))
+    }
+
+    pub fn mark_remote_available(&self, remote_name: &str) -> Result<()> {
+        Ok(self.remotes_statuses.became_available(remote_name))
+    }
 }
 
 fn docids_for_shard<'a>(

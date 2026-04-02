@@ -70,7 +70,8 @@ use meilisearch_types::milli::vector::{
     Embedder, EmbedderOptions, RuntimeEmbedder, RuntimeEmbedders, RuntimeFragment,
 };
 use meilisearch_types::milli::{self, Index};
-use meilisearch_types::network::Network;
+use meilisearch_types::network::route::Status;
+use meilisearch_types::network::{Network, RemotesStatuses};
 use meilisearch_types::task_view::TaskView;
 use meilisearch_types::tasks::network::{
     DbTaskNetwork, NetworkTopologyChange, Origin, TaskNetwork,
@@ -177,6 +178,9 @@ pub struct IndexScheduler {
     /// The list of tasks currently processing
     pub(crate) processing_tasks: Arc<RwLock<ProcessingTasks>>,
 
+    /// The statuses of the remotes.
+    pub(crate) remotes_statuses: RemotesStatuses,
+
     /// A database containing only the version of the index-scheduler
     pub version: versioning::Versioning,
     /// The queue containing both the tasks and the batches.
@@ -245,6 +249,7 @@ impl IndexScheduler {
         IndexScheduler {
             env: self.env.clone(),
             processing_tasks: self.processing_tasks.clone(),
+            remotes_statuses: self.remotes_statuses.clone(),
             version: self.version.clone(),
             queue: self.queue.private_clone(),
             scheduler: self.scheduler.private_clone(),
@@ -363,6 +368,7 @@ impl IndexScheduler {
 
         Ok(Self {
             processing_tasks: Arc::new(RwLock::new(ProcessingTasks::new())),
+            remotes_statuses: RemotesStatuses::new(),
             version,
             queue,
             scheduler,
@@ -926,6 +932,17 @@ impl IndexScheduler {
             self.scheduler.wake_up.signal();
         }
         Ok(())
+    }
+
+    pub fn network_status_change_for_remote(
+        &self,
+        remote_name: String,
+        status: Status,
+    ) -> Result<(), Error> {
+        match status {
+            Status::Available => self.mark_remote_available(&remote_name),
+            Status::Unavailable => self.mark_remote_unavailable(remote_name),
+        }
     }
 
     fn update_network_task<F, O>(
