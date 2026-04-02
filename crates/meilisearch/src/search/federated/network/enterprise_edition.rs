@@ -53,7 +53,7 @@ pub(super) fn remote_for_shard(
                         let Some(remote_for_shard) = shard
                             .remotes
                             .into_iter()
-                            .filter(|r| remotes_statuses.is_available(r))
+                            .filter(|remote| remotes_statuses.is_available(remote))
                             .choose(&mut rng)
                         else {
                             tracing::warn!("No remote for shard {shard_name}");
