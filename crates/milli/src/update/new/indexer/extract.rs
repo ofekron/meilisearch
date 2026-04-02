@@ -95,7 +95,6 @@ where
                 document_changes,
                 indexing_context,
                 extractor_allocs,
-                &extractor_sender.field_id_docid_facet_sender(),
                 IndexingStep::ExtractingFacets,
             )?
         };
