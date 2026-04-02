@@ -45,6 +45,12 @@ pub struct Shard {
 #[derive(Debug)]
 pub struct RemotesStatuses(HashMap<String, Unavailability>);
 
+impl Default for RemotesStatuses {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl RemotesStatuses {
     pub fn new() -> Self {
         Self(HashMap::default())
@@ -52,7 +58,7 @@ impl RemotesStatuses {
 
     /// Returns `true` if the remote is available, `false` otherwise.
     pub fn is_available(&self, remote: &str) -> bool {
-        self.0.pin().get(remote).map_or(true, Unavailability::is_available)
+        self.0.pin().get(remote).is_none_or(Unavailability::is_available)
     }
 
     /// Marks a remote as unavailable, extending the existing unavailability period if any.

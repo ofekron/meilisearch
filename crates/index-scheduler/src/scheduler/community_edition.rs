@@ -47,7 +47,7 @@ impl IndexScheduler {
         Err(Error::RequiresEnterpriseEdition { action: "marking a remote as unavailable" })
     }
 
-    pub fn mark_remote_available(&self, _remote_name: String) -> Result<()> {
+    pub fn mark_remote_available(&self, _remote_name: &str) -> Result<()> {
         Err(Error::RequiresEnterpriseEdition { action: "marking a remote as available" })
     }
 
