@@ -71,7 +71,7 @@ use meilisearch_types::milli::vector::{
 };
 use meilisearch_types::milli::{self, Index};
 use meilisearch_types::network::route::Status;
-use meilisearch_types::network::Network;
+use meilisearch_types::network::{Network, RemotesStatuses};
 use meilisearch_types::task_view::TaskView;
 use meilisearch_types::tasks::network::{
     DbTaskNetwork, NetworkTopologyChange, Origin, TaskNetwork,
@@ -1141,6 +1141,10 @@ impl IndexScheduler {
 
     pub fn features(&self) -> RoFeatures {
         self.features.features()
+    }
+
+    pub fn remotes_statuses(&self) -> &RemotesStatuses {
+        &self.features.remotes_statuses
     }
 
     pub fn put_runtime_features(&self, features: RuntimeTogglableFeatures) -> Result<()> {

@@ -40,7 +40,7 @@ use meilisearch_types::milli::{
     self, merge_positioned_hits_into_page, Deadline, DocumentId, FederatingResultsStep, ForeignKey,
     OrderBy, DEFAULT_VALUES_PER_FACET,
 };
-use meilisearch_types::network::{Network, Remote};
+use meilisearch_types::network::{Network, Remote, RemotesStatuses};
 use meilisearch_types::settings::DEFAULT_PAGINATION_MAX_TOTAL_HITS;
 use meilisearch_types::Document;
 use roaring::RoaringBitmap;
@@ -124,6 +124,7 @@ pub async fn perform_federated_search(
             query_index,
             &network,
             features,
+            index_scheduler.remotes_statuses(),
         )?
     }
     let federation = federation;
@@ -950,6 +951,7 @@ impl PartitionedQueries {
         query_index: usize,
         network: &Network,
         features: RoFeatures,
+        remotes_statuses: &RemotesStatuses,
     ) -> Result<(), ResponseError> {
         if let Some(pagination_field) = federated_query.has_pagination() {
             return Err(MeilisearchHttpError::PaginationInFederatedQuery(
@@ -993,7 +995,8 @@ impl PartitionedQueries {
 
         let (index_uid, query, federation_options);
         let queries = if federated_query.must_use_network(network, &features)? {
-            let partition = partition.get_or_insert_with(|| super::Partition::new(network.clone()));
+            let partition = partition
+                .get_or_insert_with(|| super::Partition::new(network.clone(), remotes_statuses));
             (index_uid, query, federation_options) = federated_query.into_index_query_federation();
 
             either::Left(partition.to_query_partition(
