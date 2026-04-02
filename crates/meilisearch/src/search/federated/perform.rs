@@ -129,6 +129,9 @@ pub async fn perform_federated_search(
     }
     let federation = federation;
 
+    let remotes_to_query: HashSet<_> =
+        partitioned_queries.remote_queries_by_host.keys().cloned().collect();
+
     // 2. perform queries, merge and make hits index by index
     // 2.1. start remote queries
     progress.update_progress(FederatingResultsStep::StartRemoteSearch);
@@ -392,6 +395,18 @@ pub async fn perform_federated_search(
 
     let performance_details =
         federation.show_performance_details.then(|| progress.accumulated_durations());
+
+    if index_scheduler.features().check_network("Track remotes availability").is_ok() {
+        for remote_name in remotes_to_query {
+            match remote_errors.get(&remote_name) {
+                // TODO is it the way to detect server errors and timeout?
+                Some(error) if error.code.is_server_error() => {
+                    index_scheduler.mark_remote_unavailable(remote_name)?
+                }
+                _ => index_scheduler.mark_remote_available(&remote_name)?,
+            }
+        }
+    }
 
     Ok((
         FederatedSearchResult {
