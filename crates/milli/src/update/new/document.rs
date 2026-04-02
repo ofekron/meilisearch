@@ -210,25 +210,22 @@ where
     }
 
     for (root, suffix) in permissive_json_pointer::root_dot_suffixes(permissive_json_pointer) {
-        match value.get(root) {
-            Some(value) => {
-                match bumparaw_collections::Value::from_raw_value(value, bump).unwrap() {
-                    bumparaw_collections::Value::Array(raw_vec) => {
-                        for value in raw_vec {
-                            if let bumparaw_collections::Value::Object(value) =
-                                bumparaw_collections::Value::from_raw_value(value, bump).unwrap()
-                            {
-                                visit_leaf_values(value, suffix, bump, visit)?;
-                            }
+        if let Some(value) = value.get(root) {
+            match bumparaw_collections::Value::from_raw_value(value, bump).unwrap() {
+                bumparaw_collections::Value::Array(raw_vec) => {
+                    for value in raw_vec {
+                        if let bumparaw_collections::Value::Object(value) =
+                            bumparaw_collections::Value::from_raw_value(value, bump).unwrap()
+                        {
+                            visit_leaf_values(value, suffix, bump, visit)?;
                         }
                     }
-                    bumparaw_collections::Value::Object(raw_map) => {
-                        visit_leaf_values(raw_map, suffix, bump, visit)?;
-                    }
-                    _ => (),
                 }
+                bumparaw_collections::Value::Object(raw_map) => {
+                    visit_leaf_values(raw_map, suffix, bump, visit)?;
+                }
+                _ => (),
             }
-            None => (),
         }
     }
     Ok(())

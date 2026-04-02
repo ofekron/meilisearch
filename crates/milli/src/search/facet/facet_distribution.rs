@@ -18,7 +18,8 @@ use crate::search::facet::facet_distribution_iter::{
 };
 use crate::update::new::document::RawFacetValue;
 use crate::{
-    Document, DocumentFromDb, Error, FieldId, FieldsIdsMap, FilterableAttributesRule, Index, PatternMatch, Result, UserError
+    Document, DocumentFromDb, Error, FieldId, FieldsIdsMap, FilterableAttributesRule, Index,
+    PatternMatch, Result, UserError,
 };
 
 /// The default number of values by facets that will
