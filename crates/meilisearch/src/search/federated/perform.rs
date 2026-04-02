@@ -399,7 +399,6 @@ pub async fn perform_federated_search(
     if index_scheduler.features().check_network("Track remotes availability").is_ok() {
         for remote_name in remotes_to_query {
             match remote_errors.get(&remote_name) {
-                // TODO is it the way to detect server errors and timeout?
                 Some(error) if error.code.is_server_error() => {
                     index_scheduler.mark_remote_unavailable(remote_name)?
                 }
